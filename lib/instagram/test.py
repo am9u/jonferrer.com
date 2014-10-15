@@ -1,36 +1,11 @@
 #!/home/jonferrer/jonferrer.env/bin/python
-""" Gets the most recent intagrams for instagram/@jonnyheadphones and saves to local redis """
-import time
-from instagram.client import InstagramAPI
+""" Gets the most recent intagrams from local redis """
 import redis
-from config import CLIENT_ID, USER_ID, REDIS_CONFIG
+from config import REDIS_CONFIG
 
 if __name__ == '__main__':
-	# Get the last 5 instagrams
-	recent_instagrams = []
-	count = 5
-	image_type = 'low_resolution'
-	api = InstagramAPI(client_id=CLIENT_ID)
-	recent_media, next_url = api.user_recent_media(user_id=USER_ID, count=count)
-	
 	redis_store = redis.Redis(REDIS_CONFIG['host'])
-	
-	for media in recent_media:
-		recent_instagram = {
-			'caption': media.caption.text,
-			'created_time': time.mktime(media.created_time.timetuple()),
-			'h': media.images[image_type].height,
-			'like_count': media.like_count,
-			#'likes': media.likes,
-			'link': media.link,
-			'url': media.images[image_type].url,
-			'w': media.images[image_type].width,
-		}
-		recent_instagrams.append(recent_instagram)	
-
-	redis_store.set(REDIS_CONFIG['instagram_recent_media_key'], recent_instagrams)
-
-	# print redis_store.get(REDIS_CONFIG['instagram_recent_media_key'])
+	print redis_store.get(REDIS_CONFIG['instagram_recent_media_key'])
 		
 
 """
